@@ -10,18 +10,15 @@ namespace LearnTodayAPI.Controllers
     public class CourseController : ControllerBase
     {
 
-        private static List<Course> courses = new List<Course>();
-
-        public CourseController()
+        private static List<Course> courses = new List<Course>()      
         {
-            courses.Add(new Course() { CourseId = 1, CourseName = "Web Developer 2.0", Technology = "FrontEnd Development", Price = 9999, DurationInHours = 20 });
-            courses.Add(new Course() { CourseId = 2, CourseName = ".Net Full Stack", Technology = "Full Stack Development", Price = 39999, DurationInHours = 100 });
+                  new Course() { CourseId = 1, CourseName = "Web Developer 2.0", Technology = "FrontEnd Development", Price = 9999, DurationInHours = 20 },
+                    new Course() { CourseId = 2, CourseName = ".Net Full Stack", Technology = "Full Stack Development", Price = 39999, DurationInHours = 100 },
 
-            courses.Add(new Course() { CourseId = 3, CourseName = "Basics of ASP .Net", Technology = "ASp.Net Core", Price = 9999, DurationInHours = 20 });
+                    new Course() { CourseId = 3, CourseName = "Basics of ASP .Net", Technology = "ASp.Net Core", Price = 9999, DurationInHours = 20 },
+                     new Course() { CourseId = 4, CourseName = "Azure DevOps", Technology = "Cloud", Price = 11999, DurationInHours = 20 }
 
-            courses.Add(new Course() { CourseId = 4, CourseName = "Azure DevOps", Technology = "Cloud", Price = 11999, DurationInHours = 20 });
-
-        }
+        };
 
 
         public ActionResult Get()
@@ -66,5 +63,11 @@ namespace LearnTodayAPI.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult PostCourse(Course course)
+        {
+            courses.Add(course);
+            return StatusCode(201,courses);
+        }
     }
 }
