@@ -1,7 +1,9 @@
+using LearnTodayAPI.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,6 +29,9 @@ namespace LearnTodayAPI
         {
 
             services.AddControllers();
+
+            //registering the dependency
+            services.AddDbContext<LearnTodayDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LearnTodayDB")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

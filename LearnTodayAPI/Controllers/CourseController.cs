@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LearnTodayAPI.Controllers
 {
@@ -9,65 +10,65 @@ namespace LearnTodayAPI.Controllers
     [ApiController]
     public class CourseController : ControllerBase
     {
+        private readonly LearnTodayDbContext dbContext;
 
-        private static List<Course> courses = new List<Course>()      
+        //dependency injection in constructor 
+        public CourseController(LearnTodayDbContext dbContext)
         {
-                  new Course() { CourseId = 1, CourseName = "Web Developer 2.0", Technology = "FrontEnd Development", Price = 9999, DurationInHours = 20 },
-                    new Course() { CourseId = 2, CourseName = ".Net Full Stack", Technology = "Full Stack Development", Price = 39999, DurationInHours = 100 },
-
-                    new Course() { CourseId = 3, CourseName = "Basics of ASP .Net", Technology = "ASp.Net Core", Price = 9999, DurationInHours = 20 },
-                     new Course() { CourseId = 4, CourseName = "Azure DevOps", Technology = "Cloud", Price = 11999, DurationInHours = 20 }
-
-        };
-
-
-        public ActionResult Get()
-        {
-          
-
-                return StatusCode(201, courses);
-         
+            this.dbContext = dbContext;
         }
 
-        [HttpGet("GetById/{id}")]
-        public ActionResult GetById(int id)
+    public IActionResult GetAllCourses()
         {
-            Course course= courses.Find(x => x.CourseId == id);
+
+         List<Course> courses=   dbContext.Courses.ToList();
+            return Ok(courses);
+
+
+        }
+
+        [HttpGet("{courseId}")]
+        public IActionResult GetCourse(int courseId)
+        {
+            Course course = dbContext.Courses.Find(courseId);// Find method will equate the passed value with a primary key of a table
             if (course==null)
             {
-                return new NotFoundResult();
+                return NotFound();
             }
             else
             {
-                return StatusCode(200, course);
+                return Ok(course);
             }
-        }
-        [HttpGet("GetByName/{courseName}")]
-        public ActionResult GetByName(string courseName)
-        {
-            if (string.IsNullOrEmpty(courseName))
-            {
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
-            else
-            {
-                Course course = courses.Find(x => x.CourseName.Equals(courseName,System.StringComparison.OrdinalIgnoreCase));
-                if (course == null)
-                {
-                    return new NotFoundResult();
-                }
-                else
-                {
-                    return StatusCode(200, course);
-                }
-            }
+
         }
 
         [HttpPost]
-        public ActionResult PostCourse(Course course)
+        public IActionResult Post(Course course)
         {
-            courses.Add(course);
-            return StatusCode(201,courses);
+
+
+         if (ModelState.IsValid)
+            {
+                dbContext.Courses.Add(course);
+                dbContext.SaveChanges();// Permantely saving the changes
+                return Created("", course);
+            }
+            else
+            {
+                var errors= new List<string>();
+                foreach (var item in ModelState)
+                {
+                    foreach (var error in item.Value.Errors)
+                    {
+                        errors.Add(error.ErrorMessage);
+                    }
+                }
+
+                return BadRequest(errors);
+            }
         }
+
+
+
     }
 }
